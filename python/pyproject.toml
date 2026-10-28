@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pun-mcp"
+version = "0.2.0"
+description = "Pun: authorization graphs and workflow analysis for Burp Suite"
+requires-python = ">=3.11"
+dependencies = ["mcp>=2.0,<3.0"]
+
+[project.scripts]
+pun-mcp = "pun_mcp.server:main"
+pun-cookie = "pun_mcp.cookie_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pun_mcp*"]
