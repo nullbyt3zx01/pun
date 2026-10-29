@@ -68,9 +68,9 @@ Pun has **two local components**: (1) the Java Burp Suite extension, and (2) the
 
 > All paths below assume you extracted the archive so that the repository root contains `README.md`, `burp-extension/`, and `python/`. Replace example paths with **your own absolute paths**. Burp and your local MCP client must reach the **same machine's** loopback bridge; WSL, containers and remote Codex hosts need special network consideration.
 
-## 1. Linux setup (Ubuntu / Debian / Fedora / Arch)
+## Linux setup (Ubuntu / Debian / Fedora / Arch)
 
-### 1.1 Install prerequisites
+### Install prerequisites
 
 **Ubuntu 24.04+ / compatible Debian releases** (package availability varies by release):
 
@@ -103,7 +103,7 @@ gradle --version        # compatible Gradle
 
 If your Linux distro defaults to a different Java, select JDK 21 (`JAVA_HOME` / `update-alternatives`) or configure the Gradle toolchain. If `python3` is older than 3.11, install a supported interpreter and use it to create the venv.
 
-### 1.2 Build the Burp Suite Java extension
+### Build the Burp Suite Java extension
 
 From the Pun repository root:
 
@@ -121,7 +121,7 @@ burp-extension/build/libs/pun-burp-0.2.0.jar
 
 The path above is relative to the repository root. This is **not** a prebuilt JAR: you must build it with Montoya/Gson dependencies available from Maven Central. This release's Java code has not been verified inside a real Burp Suite installation.
 
-### 1.3 Load Pun into Burp and enable the local bridge
+### Load Pun into Burp and enable the local bridge
 
 1. Open **Burp Suite → Extensions → Installed → Add**, select **Java**, and choose the built `pun-burp-0.2.0.jar`.
 2. Open the new **Pun** tab. In **Burp → Target → Scope**, add **only targets you are authorized to test**.
@@ -132,7 +132,7 @@ The path above is relative to the repository root. This is **not** a prebuilt JA
 
 The bridge is *not* a public MCP HTTP endpoint; do **not** add `http://127.0.0.1:8765` as a remote MCP URL in Codex or Claude.
 
-### 1.4 Install the local Python MCP package
+### Install the local Python MCP package
 
 Open a **new terminal** at the repository root (not inside `burp-extension`):
 
@@ -146,7 +146,7 @@ python3 -m venv .venv
 
 Do not run `python -m pun_mcp.server` in the foreground as a normal HTTP server. The stdio MCP process is launched by your AI client after registration. Also avoid `sudo pip install`; use the isolated `.venv`.
 
-## 2. Windows setup (PowerShell)
+## Windows setup (PowerShell)
 
 Install **JDK 21**, **Gradle 8.5+**, and **Python 3.11+**, then from the Pun repository root (example `C:\Tools\Pun`):
 
@@ -162,7 +162,7 @@ py -3.11 -m venv .venv
 
 Load `C:\Tools\Pun\burp-extension\build\libs\pun-burp-0.2.0.jar` in **Burp → Extensions → Installed → Add**, configure **Target Scope**, **Pun Exact test hosts**, and your test roles as described above. Copy the bridge token from Pun for the MCP client below. In Windows, use **PowerShell**, not Linux Bash syntax.
 
-## 3. Replay safety and permission policy
+## Replay safety and permission policy
 
 - AI tools may **queue** one replay, but **cannot execute it automatically**. Burp's **Pun → Replay queue** requires manual approval for every test.
 - Only `GET`, `HEAD`, and `OPTIONS` are enabled by default. State-changing verbs require an additional toggle **and** per-request approval.
@@ -171,7 +171,7 @@ Load `C:\Tools\Pun\burp-extension\build\libs\pun-burp-0.2.0.jar` in **Burp → E
 - Pun strips common authentication headers before applying a role; unusual credentials embedded in a body are **not rewritten**. Review all queued requests locally.
 - Decoded/raw Cookie values are visible **only in the local Burp Cookie Inspector**; the MCP tools expose redacted metadata rather than plaintext secrets.
 
-## 4. Connect OpenAI Codex (CLI + IDE)
+## Connect OpenAI Codex (CLI + IDE)
 
 Codex CLI and its IDE integration share MCP configuration. Run the registration command **once**, then Codex can launch Pun's Python MCP server whenever needed. You need `codex` installed and signed in first; see [Codex MCP documentation](https://developers.openai.com/codex/mcp).
 
@@ -245,7 +245,7 @@ codex mcp remove pun
 # Then run the appropriate 'codex mcp add pun ...' command again
 ```
 
-## 5. Connect Claude Code (Linux / macOS / Windows)
+## Connect Claude Code (Linux / macOS / Windows)
 
 Claude Code also supports the same **local stdio server**. With your Pun repository as the current directory, the following is a **Linux Bash** example:
 
@@ -268,7 +268,7 @@ claude mcp get pun
 
 Start `claude`, open `/mcp`, and call `pun_health`. On Windows, use the full `C:\Tools\Pun\.venv\Scripts\python.exe` path and PowerShell line continuations instead. See [Claude Code MCP docs](https://code.claude.com/docs/en/mcp) for commands and scopes.
 
-## 6. Cursor, Claude Desktop and other stdio clients
+## Cursor, Claude Desktop and other stdio clients
 
 Use the following shape in a client's `mcpServers` JSON (e.g. Cursor's Linux `~/.cursor/mcp.json`, or a supported Claude Desktop installation). **Replace the paths and token:**
 
@@ -289,7 +289,7 @@ Use the following shape in a client's `mcpServers` JSON (e.g. Cursor's Linux `~/
 
 On Windows, replace `command` with `C:\\Tools\\Pun\\.venv\\Scripts\\python.exe` (JSON requires escaped backslashes). **Claude Desktop availability and config paths differ by OS**; use the documented config location of your installed client. An MCP client must support **local stdio**, not only remote HTTP.
 
-## 7. Check that Pun is connected
+## Check that Pun is connected
 
 In Codex, Claude or another MCP host, ask:
 
